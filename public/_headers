@@ -1,0 +1,22 @@
+X-Content-Type-Options: nosniff
+Cross-Origin-Embedder-Policy: unsafe-none
+Cross-Origin-Opener-Policy: unsafe-none
+
+/sw.js
+  Cache-Control: no-store
+
+/scram/*
+  Access-Control-Allow-Origin: *
+  Cross-Origin-Resource-Policy: cross-origin
+
+/baremux/*
+  Access-Control-Allow-Origin: *
+  Cross-Origin-Resource-Policy: cross-origin
+
+/libcurl/*
+  Access-Control-Allow-Origin: *
+  Cross-Origin-Resource-Policy: cross-origin
+
+/epoxy/*
+  Access-Control-Allow-Origin: *
+  Cross-Origin-Resource-Policy: cross-origin
