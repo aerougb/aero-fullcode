@@ -34,7 +34,7 @@ async function doInit(): Promise<void> {
   if (!BareMux) throw new Error('BareMux v2 is unavailable');
   const connection = new BareMux.BareMuxConnection('/baremux/worker.js');
   const wispUrl = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/wisp/`;
-  await connection.setTransport('/epoxy/index.mjs', [{ wisp: wispUrl }]);
+  await connection.setTransport('/libcurl/index.mjs', [{ wisp: wispUrl }]);
   scramjetInitialized = true;
 }
 
