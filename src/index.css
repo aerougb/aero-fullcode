@@ -204,3 +204,48 @@ body {
   .movies-stage::after,
   .movies-glow { animation: none; }
 }
+
+.aero-app-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+.aero-app-shell::before,
+.aero-app-shell::after {
+  position: absolute;
+  z-index: -1;
+  width: 42vw;
+  height: 42vw;
+  max-width: 620px;
+  max-height: 620px;
+  border-radius: 50%;
+  content: '';
+  opacity: 0.12;
+  filter: blur(90px);
+  pointer-events: none;
+  animation: aero-theme-float 18s ease-in-out infinite alternate;
+}
+
+.aero-app-shell::before {
+  top: -18%;
+  left: -10%;
+  background: var(--accent);
+}
+
+.aero-app-shell::after {
+  right: -12%;
+  bottom: -20%;
+  background: var(--accent-light);
+  animation-delay: -8s;
+}
+
+[data-motion="off"] .aero-app-shell::before,
+[data-motion="off"] .aero-app-shell::after {
+  animation: none;
+  opacity: 0.04;
+}
+
+@keyframes aero-theme-float {
+  from { transform: translate3d(-24px, 16px, 0) scale(0.88); }
+  to { transform: translate3d(28px, -20px, 0) scale(1.12); }
+}

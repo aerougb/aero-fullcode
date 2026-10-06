@@ -34,7 +34,7 @@ export default function BrowserView({ initialUrl }: BrowserViewProps) {
   const [urlInput, setUrlInput] = useState('');
   const [scramjetReady, setScramjetReady] = useState(false);
   const [initError, setInitError] = useState<string | null>(null);
-  const [proxyMode, setProxyMode] = useState<'proxy' | 'direct'>('proxy');
+  const [proxyMode, setProxyMode] = useState<'proxy' | 'direct'>('direct');
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -43,7 +43,10 @@ export default function BrowserView({ initialUrl }: BrowserViewProps) {
   useEffect(() => {
     initScramjet()
       .then(() => setScramjetReady(true))
-      .catch((error: Error) => setInitError(error.message));
+      .catch((error: Error) => {
+        setInitError(error.message);
+        setProxyMode('direct');
+      });
   }, []);
 
   const updateTab = useCallback((id: string, updates: Partial<Tab>) => {
@@ -174,9 +177,11 @@ export default function BrowserView({ initialUrl }: BrowserViewProps) {
   const isBookmarked = bookmarks.some((b) => b.url === activeTab.url);
 
   const startUrl = activeTab.url
-    ? proxyMode === 'proxy' && scramjetReady
-      ? encodeUrl(activeTab.url)
-      : ''
+    ? proxyMode === 'proxy'
+      ? scramjetReady
+        ? encodeUrl(activeTab.url)
+        : ''
+      : activeTab.url
     : '';
 
   return (
@@ -272,12 +277,12 @@ export default function BrowserView({ initialUrl }: BrowserViewProps) {
         <div
           className="px-4 py-2 text-xs text-center shrink-0"
           style={{
-            background: initError ? 'rgba(244,63,94,0.1)' : 'var(--bg-tertiary)',
-            color: initError ? '#f43f5e' : 'var(--text-secondary)',
+            background: initError && proxyMode === 'proxy' ? 'rgba(244,63,94,0.1)' : 'var(--bg-tertiary)',
+            color: initError && proxyMode === 'proxy' ? '#f43f5e' : 'var(--text-secondary)',
           }}
         >
           <div className="flex items-center justify-center gap-3 flex-wrap">
-            <span>{initError ? `Proxy unavailable: ${initError}` : proxyMode === 'direct' ? 'Direct browsing mode.' : scramjetReady ? 'Scramjet proxy mode.' : 'Initializing Scramjet proxy engine...'}</span>
+            <span>{initError && proxyMode === 'direct' ? 'Direct browsing mode. Proxy server is unavailable on this host.' : initError ? `Proxy unavailable: ${initError}` : proxyMode === 'direct' ? 'Direct browsing mode.' : scramjetReady ? 'Scramjet proxy mode.' : 'Initializing Scramjet proxy engine...'}</span>
             {(scramjetReady || initError) && <button onClick={() => setProxyMode(proxyMode === 'proxy' ? 'direct' : 'proxy')} className="underline font-medium">{proxyMode === 'proxy' ? 'Use direct mode' : 'Use proxy mode'}</button>}
           </div>
         </div>

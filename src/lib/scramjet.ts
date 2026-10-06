@@ -25,7 +25,7 @@ async function doInit(): Promise<void> {
   if (!('serviceWorker' in navigator)) throw new Error('Service workers are not supported in this browser');
   await waitForGlobals();
 
-  const registration = await navigator.serviceWorker.register('/sw.js?v=20261006-v4', { scope: '/' });
+  const registration = await navigator.serviceWorker.register('/sw.js?v=20261006-v5', { scope: '/' });
   await navigator.serviceWorker.ready;
   if (!navigator.serviceWorker.controller) await waitForController(registration);
   if (!navigator.serviceWorker.controller) throw new Error('Scramjet service worker is not controlling this page');
@@ -34,7 +34,7 @@ async function doInit(): Promise<void> {
   if (!BareMux) throw new Error('BareMux v2 is unavailable');
   const connection = new BareMux.BareMuxConnection('/baremux/worker.js');
   const wispUrl = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/wisp/`;
-  await connection.setTransport('/libcurl/index.mjs', [{ wisp: wispUrl }]);
+  await connection.setTransport('/libcurl/browser.js', [{ wisp: wispUrl }]);
   scramjetInitialized = true;
 }
 

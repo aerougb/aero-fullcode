@@ -27,6 +27,7 @@ export default function App() {
   const [activeView, setActiveView] = useState<ViewId>('home');
   const [theme, setTheme] = useState<Theme>('dark');
   const [accent, setAccent] = useState<AccentColor>('blue');
+  const [motionEnabled, setMotionEnabled] = useState<boolean>(() => window.localStorage.getItem('aero-motion') !== 'off');
   const [user, setUser] = useState<AppUser | null>(null);
   const [browserTarget, setBrowserTarget] = useState<string | undefined>();
   const [isBooting, setIsBooting] = useState(true);
@@ -49,7 +50,9 @@ export default function App() {
     const root = document.documentElement;
     root.setAttribute('data-theme', theme);
     root.setAttribute('data-accent', accent);
-  }, [theme, accent]);
+    root.setAttribute('data-motion', motionEnabled ? 'on' : 'off');
+    window.localStorage.setItem('aero-motion', motionEnabled ? 'on' : 'off');
+  }, [theme, accent, motionEnabled]);
 
   useEffect(() => {
     const loadUser = async (session: Session | null) => {
@@ -117,7 +120,7 @@ export default function App() {
   ];
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
+    <div className="aero-app-shell flex h-screen overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
       <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} activeView={activeView} onViewChange={setActiveView} navItems={navItems} user={user} />
       <main className="flex-1 flex flex-col overflow-hidden">
         <header className="flex items-center gap-3 px-4 h-12 border-b shrink-0" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
@@ -128,7 +131,7 @@ export default function App() {
           {activeView === 'home' && <HomeView onNavigate={setActiveView} />}
           {activeView === 'browser' && <BrowserView initialUrl={browserTarget} />}
           {activeView === 'chat' && <ChatView user={user} />}
-          {activeView === 'settings' && <SettingsView theme={theme} accent={accent} onThemeChange={handleThemeChange} onAccentChange={handleAccentChange} user={user} />}
+          {activeView === 'settings' && <SettingsView theme={theme} accent={accent} motionEnabled={motionEnabled} onThemeChange={handleThemeChange} onAccentChange={handleAccentChange} onMotionChange={setMotionEnabled} user={user} />}
           {activeView === 'movies' && <MoviesView onOpenInBrowser={() => { setBrowserTarget('https://watch.spencerdevs.xyz/'); setActiveView('browser'); }} />}
           {activeView === 'games' && <GamesView />}
           {activeView === 'jsdelivr' && <JsdelivrGenerator />}

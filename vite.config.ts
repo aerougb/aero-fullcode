@@ -47,7 +47,7 @@ function serveScramjetAssets(): Plugin {
               res.end('Forbidden');
               return;
             }
-            const filePath = join(route.root, subPath);
+            const filePath = join(route.root, route.prefix === '/libcurl/' && subPath === 'browser.js' ? 'index.mjs' : subPath);
             if (existsSync(filePath)) {
               const ext = extname(filePath).toLowerCase();
               res.setHeader('Content-Type', mimeTypes[ext] || 'application/octet-stream');
@@ -98,7 +98,7 @@ function serveScramjetAssets(): Plugin {
               res.end('Forbidden');
               return;
             }
-            const filePath = join(route.root, subPath);
+            const filePath = join(route.root, route.prefix === '/libcurl/' && subPath === 'browser.js' ? 'index.mjs' : subPath);
             if (existsSync(filePath)) {
               const ext = extname(filePath).toLowerCase();
               res.setHeader('Content-Type', mimeTypes[ext] || 'application/octet-stream');
@@ -143,6 +143,7 @@ function serveScramjetAssets(): Plugin {
         const targetDir = join(distDir, route.prefix.replace(/^\//, ''));
         mkdirSync(targetDir, { recursive: true });
         cpSync(route.root, targetDir, { recursive: true });
+        if (route.prefix === '/libcurl/') cpSync(join(route.root, 'index.mjs'), join(targetDir, 'browser.js'));
         console.log(`[scramjet] copied ${route.prefix} assets to dist`);
       }
       cpSync(join(projectRoot, 'public/sw.js'), join(distDir, 'sw.js'));

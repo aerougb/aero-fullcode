@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react';
-import { ExternalLink, Film, Play, Search, Tv } from 'lucide-react';
+import { ExternalLink, Film, Play, Search, Star, Tv } from 'lucide-react';
 
 interface MoviesViewProps { onOpenInBrowser: () => void }
 interface MovieItem { id: string; title: string; year: string; tmdbId: number }
 interface TvItem { id: string; title: string; year: string; tmdbId: number; season: number; episode: number }
 type LibraryItem = (MovieItem & { type: 'movie' }) | (TvItem & { type: 'tv' });
+interface CatalogMeta { rating: number; popularity: string; description: string }
 
 const MOVIES: MovieItem[] = [
   { id: 'inception', title: 'Inception', year: '2010', tmdbId: 27205 },
@@ -48,6 +49,21 @@ const TV_SHOWS: TvItem[] = [
   { id: 'succession', title: 'Succession', year: '2018', tmdbId: 87108, season: 1, episode: 1 },
 ];
 
+const CATALOG_META: Record<string, CatalogMeta> = {
+  inception: { rating: 8.8, popularity: 'Popular', description: 'A skilled thief who steals secrets through dreams is offered a chance to erase his past with one impossible final job.' },
+  interstellar: { rating: 8.7, popularity: 'Trending', description: 'Explorers travel beyond the galaxy to search for a future home for humanity.' },
+  'dark-knight': { rating: 9.0, popularity: 'Popular', description: 'Batman faces a criminal mastermind whose plan pushes Gotham and its heroes to their limits.' },
+  oppenheimer: { rating: 8.6, popularity: 'Trending', description: 'A dramatic portrait of the scientist whose work changed the course of modern history.' },
+  'breaking-bad': { rating: 9.5, popularity: 'Popular', description: 'A chemistry teacher turns to a dangerous new life while trying to secure his family’s future.' },
+  'stranger-things': { rating: 8.6, popularity: 'Trending', description: 'A group of friends uncover a secret experiment and a strange world beneath their small town.' },
+  'the-boys': { rating: 8.7, popularity: 'Popular', description: 'A rebellious crew takes on powerful superheroes who abuse their public image and authority.' },
+  wednesday: { rating: 8.0, popularity: 'Trending', description: 'A sharp-witted student investigates mysteries at a strange and extraordinary academy.' },
+};
+
+function getCatalogMeta(item: LibraryItem): CatalogMeta {
+  return CATALOG_META[item.id] || { rating: 7.8, popularity: 'Discover', description: `Explore ${item.title} in the Aero watch room.` };
+}
+
 const movieEmbed = (tmdbId: number) => `https://vidphantom.com/movie/${tmdbId}`;
 const tvEmbed = (show: TvItem) => `https://vidphantom.com/tv/${show.tmdbId}/${show.season}/${show.episode}`;
 
@@ -59,6 +75,7 @@ export default function MoviesView({ onOpenInBrowser: _onOpenInBrowser }: Movies
   const library = useMemo<LibraryItem[]>(() => (category === 'movies' ? MOVIES.map((item) => ({ ...item, type: 'movie' as const })) : TV_SHOWS.map((item) => ({ ...item, type: 'tv' as const }))), [category]);
   const filteredItems = library.filter((item) => item.title.toLowerCase().includes(query.trim().toLowerCase()));
   const embedUrl = selected.type === 'movie' ? movieEmbed(selected.tmdbId) : tvEmbed(selected);
+  const selectedMeta = getCatalogMeta(selected);
 
   const switchCategory = (nextCategory: 'movies' | 'tv') => {
     setCategory(nextCategory);
@@ -105,6 +122,7 @@ export default function MoviesView({ onOpenInBrowser: _onOpenInBrowser }: Movies
 
           <section className="overflow-hidden rounded-2xl" style={{ background: '#000', border: '1px solid var(--border)' }}>
             <div className="flex items-center justify-between border-b px-4 py-3" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}><div className="min-w-0"><h2 className="truncate text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{selected.title}</h2><p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{selected.type === 'movie' ? `${selected.year} · Movie` : `${selected.year} · Season ${selected.season}, episode ${selected.episode}`}</p></div><a href={embedUrl} target="_blank" rel="noreferrer" className="rounded-lg p-2 transition-opacity hover:opacity-80" style={{ color: 'var(--accent)' }} aria-label="Open player in a new tab"><ExternalLink size={16} /></a></div>
+            <div className="border-b px-4 py-3" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}><div className="mb-2 flex items-center gap-3 text-xs"><span className="rounded-full px-2 py-1 font-semibold" style={{ background: 'rgba(45,140,255,0.16)', color: 'var(--accent-light)' }}>{selectedMeta.popularity}</span><span className="flex items-center gap-1 font-semibold" style={{ color: 'var(--text-primary)' }}><Star size={13} fill="currentColor" style={{ color: '#fbbf24' }} /> {selectedMeta.rating.toFixed(1)}</span></div><p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{selectedMeta.description}</p></div>
             <iframe key={embedUrl} src={embedUrl} title={`${selected.title} player`} className="h-[min(68vh,680px)] w-full border-0" allow="fullscreen; autoplay; encrypted-media; picture-in-picture" allowFullScreen scrolling="no" />
           </section>
         </div>
