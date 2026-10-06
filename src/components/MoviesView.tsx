@@ -98,9 +98,9 @@ export default function MoviesView({ onOpenInBrowser: _onOpenInBrowser }: Movies
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl" style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}><Film size={22} style={{ color: 'var(--accent)' }} /></div>
               <div><p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: 'var(--accent)' }}>Watch room</p><h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Movies & shows</h1></div>
             </div>
-            <p className="mt-3 max-w-2xl text-sm" style={{ color: 'var(--text-secondary)' }}>Pick a title and play it directly in the embedded VidPhantom player.</p>
+            <p className="mt-3 max-w-2xl text-sm" style={{ color: 'var(--text-secondary)' }}>Pick a title to open in the Aero watch room, with ratings, descriptions, and episode details.</p>
           </div>
-          <a href="https://vidphantom.live/" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 self-start rounded-xl px-3 py-2 text-xs font-semibold transition-opacity hover:opacity-80 lg:self-auto" style={{ color: 'var(--accent)', background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>Browse VidPhantom <ExternalLink size={14} /></a>
+          <span className="rounded-xl px-3 py-2 text-xs font-semibold" style={{ color: 'var(--text-secondary)', background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>Aero watch room</span>
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
