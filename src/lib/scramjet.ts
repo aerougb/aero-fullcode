@@ -25,7 +25,7 @@ async function doInit(): Promise<void> {
   if (!('serviceWorker' in navigator)) throw new Error('Service workers are not supported in this browser');
   await waitForGlobals();
 
-  const registration = await navigator.serviceWorker.register('/sw.js?v=20261005-v3', { scope: '/' });
+  const registration = await navigator.serviceWorker.register('/sw.js?v=20261006-v4', { scope: '/' });
   await navigator.serviceWorker.ready;
   if (!navigator.serviceWorker.controller) await waitForController(registration);
   if (!navigator.serviceWorker.controller) throw new Error('Scramjet service worker is not controlling this page');

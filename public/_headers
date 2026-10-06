@@ -1,6 +1,7 @@
-X-Content-Type-Options: nosniff
-Cross-Origin-Embedder-Policy: unsafe-none
-Cross-Origin-Opener-Policy: unsafe-none
+/*
+  X-Content-Type-Options: nosniff
+  Cross-Origin-Embedder-Policy: unsafe-none
+  Cross-Origin-Opener-Policy: unsafe-none
 
 /sw.js
   Cache-Control: no-store

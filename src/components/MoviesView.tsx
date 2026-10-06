@@ -71,8 +71,10 @@ export default function MoviesView({ onOpenInBrowser: _onOpenInBrowser }: Movies
   };
 
   return (
-    <div className="h-full overflow-y-auto p-4 md:p-6" style={{ background: 'var(--bg-primary)' }}>
-      <div className="mx-auto max-w-7xl space-y-5">
+    <div className="movies-stage relative h-full overflow-y-auto p-4 md:p-6" style={{ background: 'var(--bg-primary)' }}>
+      <div className="movies-glow movies-glow-one" />
+      <div className="movies-glow movies-glow-two" />
+      <div className="relative mx-auto max-w-7xl space-y-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <div className="flex items-center gap-3">
