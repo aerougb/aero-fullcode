@@ -25,10 +25,10 @@ async function doInit(): Promise<void> {
   if (!('serviceWorker' in navigator)) throw new Error('Service workers are not supported in this browser');
   await waitForGlobals();
 
-  const registration = await navigator.serviceWorker.register('/sw.js?v=20261006-v5', { scope: '/', updateViaCache: 'none' });
+  const registration = await navigator.serviceWorker.register('/sw.js?v=20261007-v6', { scope: '/', updateViaCache: 'none' });
   await navigator.serviceWorker.ready;
   if (!navigator.serviceWorker.controller && registration.active) {
-    const reloadKey = 'aero-service-worker-reloaded-v5';
+    const reloadKey = 'aero-service-worker-reloaded-v6';
     if (window.sessionStorage.getItem(reloadKey) !== '1') {
       window.sessionStorage.setItem(reloadKey, '1');
       window.location.reload();
@@ -37,7 +37,7 @@ async function doInit(): Promise<void> {
   }
   if (!navigator.serviceWorker.controller) await waitForController(registration);
   if (!navigator.serviceWorker.controller) throw new Error('Scramjet service worker is not controlling this page');
-  window.sessionStorage.removeItem('aero-service-worker-reloaded-v5');
+  window.sessionStorage.removeItem('aero-service-worker-reloaded-v6');
 
   const BareMux = window.BareMux;
   if (!BareMux) throw new Error('BareMux v2 is unavailable');

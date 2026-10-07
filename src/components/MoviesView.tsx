@@ -47,6 +47,20 @@ const TV_SHOWS: TvItem[] = [
   { id: 'attack-on-titan', title: 'Attack on Titan', year: '2013', tmdbId: 1429, season: 1, episode: 1 },
   { id: 'one-piece', title: 'One Piece', year: '1999', tmdbId: 37854, season: 1, episode: 1 },
   { id: 'succession', title: 'Succession', year: '2018', tmdbId: 87108, season: 1, episode: 1 },
+  { id: 'the-sopranos', title: 'The Sopranos', year: '1999', tmdbId: 1398, season: 1, episode: 1 },
+  { id: 'the-wire', title: 'The Wire', year: '2002', tmdbId: 1438, season: 1, episode: 1 },
+  { id: 'peaky-blinders', title: 'Peaky Blinders', year: '2013', tmdbId: 60574, season: 1, episode: 1 },
+  { id: 'the-mandalorian', title: 'The Mandalorian', year: '2019', tmdbId: 82856, season: 1, episode: 1 },
+  { id: 'house-of-the-dragon', title: 'House of the Dragon', year: '2022', tmdbId: 94997, season: 1, episode: 1 },
+  { id: 'the-last-dance', title: 'The Last Dance', year: '2020', tmdbId: 79525, season: 1, episode: 1 },
+  { id: 'black-mirror', title: 'Black Mirror', year: '2011', tmdbId: 42009, season: 1, episode: 1 },
+  { id: 'the-crown', title: 'The Crown', year: '2016', tmdbId: 65494, season: 1, episode: 1 },
+  { id: 'the-bear', title: 'The Bear', year: '2022', tmdbId: 136315, season: 1, episode: 1 },
+  { id: 'arcane', title: 'Arcane', year: '2021', tmdbId: 94605, season: 1, episode: 1 },
+  { id: 'yellowstone', title: 'Yellowstone', year: '2018', tmdbId: 73586, season: 1, episode: 1 },
+  { id: 'the-umbrella-academy', title: 'The Umbrella Academy', year: '2019', tmdbId: 75006, season: 1, episode: 1 },
+  { id: 'house', title: 'House', year: '2004', tmdbId: 1400, season: 1, episode: 1 },
+  { id: 'the-x-files', title: 'The X-Files', year: '1993', tmdbId: 4087, season: 1, episode: 1 },
 ];
 
 const CATALOG_META: Record<string, CatalogMeta> = {

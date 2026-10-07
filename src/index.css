@@ -227,9 +227,14 @@ body {
 }
 
 .aero-app-shell::before {
-  top: -18%;
-  left: -10%;
-  background: var(--accent);
+  inset: 0;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  filter: none;
+  opacity: 0.08;
+  background: radial-gradient(circle at 15% 10%, var(--accent), transparent 34%), repeating-linear-gradient(115deg, transparent 0 100px, var(--accent) 120px 122px, transparent 150px 260px);
+  animation: aero-theme-drift 20s linear infinite;
 }
 
 .aero-app-shell::after {
@@ -243,6 +248,11 @@ body {
 [data-motion="off"] .aero-app-shell::after {
   animation: none;
   opacity: 0.04;
+}
+
+@keyframes aero-theme-drift {
+  from { transform: translate3d(-6%, -3%, 0) rotate(0deg); }
+  to { transform: translate3d(6%, 3%, 0) rotate(3deg); }
 }
 
 @keyframes aero-theme-float {

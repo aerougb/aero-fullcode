@@ -34,7 +34,6 @@ export default function BrowserView({ initialUrl }: BrowserViewProps) {
   const [urlInput, setUrlInput] = useState('');
   const [scramjetReady, setScramjetReady] = useState(false);
   const [initError, setInitError] = useState<string | null>(null);
-  const [proxyMode, setProxyMode] = useState<'proxy' | 'direct'>('direct');
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -43,10 +42,7 @@ export default function BrowserView({ initialUrl }: BrowserViewProps) {
   useEffect(() => {
     initScramjet()
       .then(() => setScramjetReady(true))
-      .catch((error: Error) => {
-        setInitError(error.message);
-        setProxyMode('direct');
-      });
+      .catch((error: Error) => setInitError(error.message));
   }, []);
 
   const updateTab = useCallback((id: string, updates: Partial<Tab>) => {
@@ -100,7 +96,7 @@ export default function BrowserView({ initialUrl }: BrowserViewProps) {
   const handleIframeLoad = () => {
     const iframe = iframeRef.current;
     const bodyText = iframe?.contentDocument?.body?.textContent || '';
-    if (proxyMode === 'proxy' && /Request failed with error code|Could not connect to server/i.test(bodyText)) {
+    if (/Request failed with error code|Could not connect to server/i.test(bodyText)) {
       setInitError('The proxy server could not reach that site.');
       return;
     }
@@ -176,13 +172,7 @@ export default function BrowserView({ initialUrl }: BrowserViewProps) {
 
   const isBookmarked = bookmarks.some((b) => b.url === activeTab.url);
 
-  const startUrl = activeTab.url
-    ? proxyMode === 'proxy'
-      ? scramjetReady
-        ? encodeUrl(activeTab.url)
-        : ''
-      : activeTab.url
-    : '';
+  const startUrl = activeTab.url && scramjetReady ? encodeUrl(activeTab.url) : '';
 
   return (
     <div className="flex flex-col h-full" style={{ background: 'var(--bg-primary)' }}>
@@ -277,13 +267,12 @@ export default function BrowserView({ initialUrl }: BrowserViewProps) {
         <div
           className="px-4 py-2 text-xs text-center shrink-0"
           style={{
-            background: initError && proxyMode === 'proxy' ? 'rgba(244,63,94,0.1)' : 'var(--bg-tertiary)',
-            color: initError && proxyMode === 'proxy' ? '#f43f5e' : 'var(--text-secondary)',
+            background: initError ? 'rgba(244,63,94,0.1)' : 'var(--bg-tertiary)',
+            color: initError ? '#f43f5e' : 'var(--text-secondary)',
           }}
         >
           <div className="flex items-center justify-center gap-3 flex-wrap">
-            <span>{initError && proxyMode === 'direct' ? 'Direct browsing mode. Proxy server is unavailable on this host.' : initError ? `Proxy unavailable: ${initError}` : proxyMode === 'direct' ? 'Direct browsing mode.' : scramjetReady ? 'Scramjet proxy mode.' : 'Initializing Scramjet proxy engine...'}</span>
-            {(scramjetReady || initError) && <button onClick={() => setProxyMode(proxyMode === 'proxy' ? 'direct' : 'proxy')} className="underline font-medium">{proxyMode === 'proxy' ? 'Use direct mode' : 'Use proxy mode'}</button>}
+            <span>{initError ? `Proxy unavailable: ${initError}` : scramjetReady ? 'Scramjet proxy mode.' : 'Initializing Scramjet proxy engine...'}</span>
           </div>
         </div>
       )}
