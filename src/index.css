@@ -139,71 +139,7 @@ body {
   animation: pulse 2s infinite;
 }
 
-.movies-stage {
-  isolation: isolate;
-}
-
-.movies-stage::before {
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-  content: '';
-  background:
-    radial-gradient(circle at 15% 10%, rgba(45, 140, 255, 0.24), transparent 34%),
-    radial-gradient(circle at 85% 70%, rgba(14, 116, 214, 0.18), transparent 36%),
-    linear-gradient(135deg, #061226 0%, #071a33 48%, #04101f 100%);
-}
-
-.movies-stage::after {
-  position: absolute;
-  inset: -30%;
-  z-index: -1;
-  content: '';
-  opacity: 0.45;
-  background: repeating-linear-gradient(115deg, transparent 0 100px, rgba(126, 203, 255, 0.08) 120px 122px, transparent 150px 260px);
-  animation: movies-drift 20s linear infinite;
-  pointer-events: none;
-}
-
-.movies-glow {
-  position: absolute;
-  z-index: -1;
-  width: 280px;
-  height: 280px;
-  border-radius: 999px;
-  filter: blur(70px);
-  opacity: 0.3;
-  pointer-events: none;
-  animation: movies-float 12s ease-in-out infinite alternate;
-}
-
-.movies-glow-one {
-  top: 14%;
-  left: 8%;
-  background: #2389ff;
-}
-
-.movies-glow-two {
-  right: 10%;
-  bottom: 8%;
-  background: #0b5fd7;
-  animation-delay: -5s;
-}
-
-@keyframes movies-drift {
-  from { transform: translate3d(-6%, -3%, 0) rotate(0deg); }
-  to { transform: translate3d(6%, 3%, 0) rotate(3deg); }
-}
-
-@keyframes movies-float {
-  from { transform: translate3d(-18px, 10px, 0) scale(0.9); }
-  to { transform: translate3d(18px, -16px, 0) scale(1.12); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .movies-stage::after,
-  .movies-glow { animation: none; }
-}
+/* ===== Unified animated background — identical on every page ===== */
 
 .aero-app-shell {
   position: relative;
@@ -211,14 +147,15 @@ body {
   overflow: hidden;
 }
 
+/* Layer 0: uploaded user background image (optional, behind everything) */
 .aero-user-background {
   position: absolute;
   inset: 0;
-  z-index: -2;
+  z-index: -3;
   background-position: center;
   background-size: cover;
   filter: saturate(0.9) contrast(1.05);
-  opacity: 0.22;
+  opacity: 0.18;
   pointer-events: none;
 }
 
@@ -226,55 +163,90 @@ body {
   position: absolute;
   inset: 0;
   content: '';
-  background: linear-gradient(135deg, rgba(2, 7, 17, 0.82), rgba(2, 7, 17, 0.46));
+  background: linear-gradient(135deg, rgba(2, 7, 17, 0.84), rgba(2, 7, 17, 0.52));
 }
 
-.aero-app-shell::before,
+/* Layer 1: base gradient wash — always visible, gives depth */
+.aero-app-shell::before {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  content: '';
+  background:
+    radial-gradient(ellipse at 12% 8%, rgba(45, 140, 255, 0.22), transparent 38%),
+    radial-gradient(ellipse at 88% 72%, rgba(14, 116, 214, 0.16), transparent 40%),
+    radial-gradient(ellipse at 50% 100%, rgba(27, 92, 180, 0.12), transparent 50%),
+    linear-gradient(140deg, #04101f 0%, #061a33 42%, #03101e 100%);
+  pointer-events: none;
+}
+
+/* Layer 2: slow-moving diagonal light bands — the signature animation */
 .aero-app-shell::after {
   position: absolute;
+  inset: -30%;
   z-index: -1;
-  width: 42vw;
-  height: 42vw;
-  max-width: 620px;
-  max-height: 620px;
-  border-radius: 50%;
   content: '';
-  opacity: 0.12;
-  filter: blur(90px);
+  opacity: 0.5;
+  background: repeating-linear-gradient(
+    115deg,
+    transparent 0 110px,
+    rgba(126, 203, 255, 0.07) 130px 133px,
+    transparent 160px 280px
+  );
+  animation: aero-bg-drift 24s linear infinite;
   pointer-events: none;
-  animation: aero-theme-float 18s ease-in-out infinite alternate;
 }
 
-.aero-app-shell::before {
-  inset: 0;
-  width: auto;
-  height: auto;
-  border-radius: 0;
-  filter: none;
-  opacity: 0.08;
-  background: radial-gradient(circle at 15% 10%, var(--accent), transparent 34%), repeating-linear-gradient(115deg, transparent 0 100px, var(--accent) 120px 122px, transparent 150px 260px);
-  animation: aero-theme-drift 20s linear infinite;
+/* Floating glow orbs for extra depth */
+.aero-bg-glow {
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.22;
+  pointer-events: none;
+  animation: aero-bg-float 16s ease-in-out infinite alternate;
 }
 
-.aero-app-shell::after {
-  right: -12%;
-  bottom: -20%;
+.aero-bg-glow-one {
+  top: 10%;
+  left: 6%;
+  width: 300px;
+  height: 300px;
+  background: var(--accent);
+}
+
+.aero-bg-glow-two {
+  right: 8%;
+  bottom: 6%;
+  width: 340px;
+  height: 340px;
   background: var(--accent-light);
-  animation-delay: -8s;
+  animation-delay: -6s;
 }
 
-[data-motion="off"] .aero-app-shell::before,
-[data-motion="off"] .aero-app-shell::after {
+@keyframes aero-bg-drift {
+  from { transform: translate3d(-7%, -4%, 0) rotate(0deg); }
+  to { transform: translate3d(7%, 4%, 0) rotate(2.5deg); }
+}
+
+@keyframes aero-bg-float {
+  from { transform: translate3d(-20px, 14px, 0) scale(0.9); }
+  to { transform: translate3d(24px, -18px, 0) scale(1.1); }
+}
+
+[data-motion="off"] .aero-app-shell::after,
+[data-motion="off"] .aero-bg-glow {
   animation: none;
   opacity: 0.04;
 }
 
-@keyframes aero-theme-drift {
-  from { transform: translate3d(-6%, -3%, 0) rotate(0deg); }
-  to { transform: translate3d(6%, 3%, 0) rotate(3deg); }
+@media (prefers-reduced-motion: reduce) {
+  .aero-app-shell::after,
+  .aero-bg-glow { animation: none; }
 }
 
-@keyframes aero-theme-float {
-  from { transform: translate3d(-24px, 16px, 0) scale(0.88); }
-  to { transform: translate3d(28px, -20px, 0) scale(1.12); }
+/* Movies page reuses the same background — no separate style needed */
+.movies-stage {
+  isolation: isolate;
 }

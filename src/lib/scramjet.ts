@@ -42,9 +42,42 @@ async function doInit(): Promise<void> {
   const BareMux = window.BareMux;
   if (!BareMux) throw new Error('BareMux v2 is unavailable');
   const connection = new BareMux.BareMuxConnection('/baremux/worker.js');
-  const wispUrl = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/wisp/`;
-  const fallbackWispUrl = 'wss://wisp.mercurywork.shop/';
-  await connection.setTransport('/libcurl/browser.js', [{ wisp: wispUrl }]);
+
+  const localWisp = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/wisp/`;
+  const publicWisp = 'wss://wisp.mercurywork.shop/';
+
+  const trySetTransport = async (wispUrl: string, label: string): Promise<boolean> => {
+    try {
+      const probe = new Promise<boolean>((resolve) => {
+        const ws = new WebSocket(wispUrl);
+        const timer = window.setTimeout(() => {
+          ws.close();
+          resolve(false);
+        }, 4000);
+        ws.addEventListener('open', () => {
+          window.clearTimeout(timer);
+          ws.close();
+          resolve(true);
+        });
+        ws.addEventListener('error', () => {
+          window.clearTimeout(timer);
+          resolve(false);
+        });
+      });
+      const reachable = await probe;
+      if (!reachable) return false;
+      await connection.setTransport('/libcurl/browser.js', [{ wisp: wispUrl }]);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const localOk = await trySetTransport(localWisp, 'local');
+  if (!localOk) {
+    const publicOk = await trySetTransport(publicWisp, 'public');
+    if (!publicOk) throw new Error('No Wisp proxy server available — tried local and public fallback');
+  }
   scramjetInitialized = true;
 }
 

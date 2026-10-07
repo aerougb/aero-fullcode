@@ -151,6 +151,8 @@ export default function App() {
   return (
     <div className="aero-app-shell flex h-screen overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
       <div className="aero-user-background" aria-hidden="true" style={backgroundUrl ? { backgroundImage: `url("${backgroundUrl}")` } : undefined} />
+      <div className="aero-bg-glow aero-bg-glow-one" aria-hidden="true" />
+      <div className="aero-bg-glow aero-bg-glow-two" aria-hidden="true" />
       <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} activeView={activeView} onViewChange={setActiveView} navItems={navItems} user={user} />
       <main className="flex-1 flex flex-col overflow-hidden">
         <header className="flex items-center gap-3 px-4 h-12 border-b shrink-0" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
