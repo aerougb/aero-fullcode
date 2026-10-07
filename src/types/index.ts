@@ -11,13 +11,24 @@ export interface ChatMessage {
   created_at: string;
 }
 
+export interface CustomColors {
+  background?: string;
+  surface?: string;
+  accent?: string;
+  glow?: string;
+}
+
 export interface UserSettings {
   id?: string;
+  user_id?: string;
   theme: Theme;
   accent_color: AccentColor;
   privacy_clear_on_exit: boolean;
   privacy_block_trackers: boolean;
   privacy_dnt: boolean;
+  avatar_path?: string | null;
+  background_path?: string | null;
+  custom_colors?: CustomColors;
 }
 
 export interface Bookmark {

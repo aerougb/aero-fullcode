@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Menu, Home, Globe, MessageSquare, Settings, Film, GamepadIcon, Github } from 'lucide-react';
 import type { Session } from '@supabase/supabase-js';
-import type { ViewId, Theme, AccentColor } from '@/types';
+import type { ViewId, Theme, AccentColor, CustomColors, UserSettings } from '@/types';
+import { normalizeCustomColors } from '@/lib/appearance';
 import { supabase } from '@/lib/supabase';
 import Sidebar from '@/components/Sidebar';
 import HomeView from '@/components/HomeView';
@@ -28,6 +29,9 @@ export default function App() {
   const [theme, setTheme] = useState<Theme>('dark');
   const [accent, setAccent] = useState<AccentColor>('blue');
   const [motionEnabled, setMotionEnabled] = useState<boolean>(() => window.localStorage.getItem('aero-motion') !== 'off');
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [backgroundUrl, setBackgroundUrl] = useState<string | null>(null);
+  const [customColors, setCustomColors] = useState<CustomColors>({});
   const [user, setUser] = useState<AppUser | null>(null);
   const [browserTarget, setBrowserTarget] = useState<string | undefined>();
   const [isBooting, setIsBooting] = useState(true);
@@ -51,10 +55,36 @@ export default function App() {
     root.setAttribute('data-theme', theme);
     root.setAttribute('data-accent', accent);
     root.setAttribute('data-motion', motionEnabled ? 'on' : 'off');
+    const customVariables: Record<string, string | undefined> = {
+      '--bg-primary': customColors.background,
+      '--bg-secondary': customColors.surface,
+      '--accent': customColors.accent,
+      '--accent-light': customColors.glow,
+    };
+    Object.entries(customVariables).forEach(([name, value]) => {
+      if (value) root.style.setProperty(name, value);
+      else root.style.removeProperty(name);
+    });
     window.localStorage.setItem('aero-motion', motionEnabled ? 'on' : 'off');
-  }, [theme, accent, motionEnabled]);
+  }, [theme, accent, motionEnabled, customColors]);
 
   useEffect(() => {
+    const loadAppearance = async (userId: string) => {
+      const { data } = await supabase.from('user_settings').select('*').eq('user_id', userId).maybeSingle();
+      if (!data) return;
+      const settings = data as UserSettings;
+      setCustomColors(normalizeCustomColors(settings.custom_colors));
+      const assets = supabase.storage.from('user-assets');
+      const [avatar, background] = await Promise.all([
+        settings.avatar_path ? assets.createSignedUrl(settings.avatar_path, 3600) : Promise.resolve({ data: null }),
+        settings.background_path ? assets.createSignedUrl(settings.background_path, 3600) : Promise.resolve({ data: null }),
+      ]);
+      setAvatarUrl(avatar.data?.signedUrl || null);
+      setBackgroundUrl(background.data?.signedUrl || null);
+      setTheme(settings.theme as Theme);
+      setAccent(settings.accent_color as AccentColor);
+    };
+
     const loadUser = async (session: Session | null) => {
       if (!session) {
         setUser(null);
@@ -73,20 +103,19 @@ export default function App() {
       });
     };
 
-    supabase.auth.getSession().then(({ data }) => { void loadUser(data.session); });
+    supabase.auth.getSession().then(({ data }) => {
+      void loadUser(data.session);
+      if (data.session) void loadAppearance(data.session.user.id);
+    });
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       (async () => {
         await loadUser(session);
         if (session) {
-          const { data: settings } = await supabase
-            .from('user_settings')
-            .select('*')
-            .eq('user_id', session.user.id)
-            .maybeSingle();
-          if (settings) {
-            setTheme(settings.theme as Theme);
-            setAccent(settings.accent_color as AccentColor);
-          }
+          await loadAppearance(session.user.id);
+        } else {
+          setAvatarUrl(null);
+          setBackgroundUrl(null);
+          setCustomColors({});
         }
       })();
     });
@@ -121,6 +150,7 @@ export default function App() {
 
   return (
     <div className="aero-app-shell flex h-screen overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
+      <div className="aero-user-background" aria-hidden="true" style={backgroundUrl ? { backgroundImage: `url("${backgroundUrl}")` } : undefined} />
       <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} activeView={activeView} onViewChange={setActiveView} navItems={navItems} user={user} />
       <main className="flex-1 flex flex-col overflow-hidden">
         <header className="flex items-center gap-3 px-4 h-12 border-b shrink-0" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
@@ -131,7 +161,7 @@ export default function App() {
           {activeView === 'home' && <HomeView onNavigate={setActiveView} />}
           {activeView === 'browser' && <BrowserView initialUrl={browserTarget} />}
           {activeView === 'chat' && <ChatView user={user} />}
-          {activeView === 'settings' && <SettingsView theme={theme} accent={accent} motionEnabled={motionEnabled} onThemeChange={handleThemeChange} onAccentChange={handleAccentChange} onMotionChange={setMotionEnabled} user={user} />}
+          {activeView === 'settings' && <SettingsView theme={theme} accent={accent} motionEnabled={motionEnabled} avatarUrl={avatarUrl} backgroundUrl={backgroundUrl} customColors={customColors} onThemeChange={handleThemeChange} onAccentChange={handleAccentChange} onMotionChange={setMotionEnabled} onAvatarUrlChange={setAvatarUrl} onBackgroundUrlChange={setBackgroundUrl} onCustomColorsChange={setCustomColors} user={user} />}
           {activeView === 'movies' && <MoviesView onOpenInBrowser={() => { setBrowserTarget('https://watch.spencerdevs.xyz/'); setActiveView('browser'); }} />}
           {activeView === 'games' && <GamesView />}
           {activeView === 'jsdelivr' && <JsdelivrGenerator />}

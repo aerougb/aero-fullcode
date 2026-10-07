@@ -208,6 +208,25 @@ body {
 .aero-app-shell {
   position: relative;
   isolation: isolate;
+  overflow: hidden;
+}
+
+.aero-user-background {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-position: center;
+  background-size: cover;
+  filter: saturate(0.9) contrast(1.05);
+  opacity: 0.22;
+  pointer-events: none;
+}
+
+.aero-user-background::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  background: linear-gradient(135deg, rgba(2, 7, 17, 0.82), rgba(2, 7, 17, 0.46));
 }
 
 .aero-app-shell::before,
