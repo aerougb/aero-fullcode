@@ -43,6 +43,7 @@ async function doInit(): Promise<void> {
   if (!BareMux) throw new Error('BareMux v2 is unavailable');
   const connection = new BareMux.BareMuxConnection('/baremux/worker.js');
   const wispUrl = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/wisp/`;
+  const fallbackWispUrl = 'wss://wisp.mercurywork.shop/';
   await connection.setTransport('/libcurl/browser.js', [{ wisp: wispUrl }]);
   scramjetInitialized = true;
 }
