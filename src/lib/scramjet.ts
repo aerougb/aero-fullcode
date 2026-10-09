@@ -23,12 +23,18 @@ export async function initScramjet(): Promise<void> {
 
 async function doInit(): Promise<void> {
   if (!('serviceWorker' in navigator)) throw new Error('Service workers are not supported in this browser');
-  await waitForGlobals();
 
-  const registration = await navigator.serviceWorker.register('/sw.js?v=20261007-v6', { scope: '/', updateViaCache: 'none' });
+  console.log('[scramjet] waiting for globals...');
+  await waitForGlobals();
+  console.log('[scramjet] globals ready');
+
+  const registration = await navigator.serviceWorker.register('/sw.js?v=20261009-v7', { scope: '/', updateViaCache: 'none' });
+  console.log('[scramjet] SW registered');
   await navigator.serviceWorker.ready;
+  console.log('[scramjet] SW ready, controller:', !!navigator.serviceWorker.controller);
+
   if (!navigator.serviceWorker.controller && registration.active) {
-    const reloadKey = 'aero-service-worker-reloaded-v6';
+    const reloadKey = 'aero-service-worker-reloaded-v7';
     if (window.sessionStorage.getItem(reloadKey) !== '1') {
       window.sessionStorage.setItem(reloadKey, '1');
       window.location.reload();
@@ -37,48 +43,47 @@ async function doInit(): Promise<void> {
   }
   if (!navigator.serviceWorker.controller) await waitForController(registration);
   if (!navigator.serviceWorker.controller) throw new Error('Scramjet service worker is not controlling this page');
-  window.sessionStorage.removeItem('aero-service-worker-reloaded-v6');
+  window.sessionStorage.removeItem('aero-service-worker-reloaded-v7');
+  console.log('[scramjet] SW controlling page');
 
   const BareMux = window.BareMux;
   if (!BareMux) throw new Error('BareMux v2 is unavailable');
   const connection = new BareMux.BareMuxConnection('/baremux/worker.js');
 
+  // The deployed host is static (no Node server), so the local /wisp/ endpoint
+  // doesn't exist. Try local first (works in dev), then fall back to the public
+  // Mercury Workshop Wisp server.
   const localWisp = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/wisp/`;
   const publicWisp = 'wss://wisp.mercurywork.shop/';
 
-  const trySetTransport = async (wispUrl: string, label: string): Promise<boolean> => {
+  const tryTransport = async (wispUrl: string): Promise<boolean> => {
     try {
-      const probe = new Promise<boolean>((resolve) => {
-        const ws = new WebSocket(wispUrl);
-        const timer = window.setTimeout(() => {
-          ws.close();
-          resolve(false);
-        }, 4000);
-        ws.addEventListener('open', () => {
-          window.clearTimeout(timer);
-          ws.close();
-          resolve(true);
-        });
-        ws.addEventListener('error', () => {
-          window.clearTimeout(timer);
-          resolve(false);
-        });
-      });
-      const reachable = await probe;
-      if (!reachable) return false;
+      console.log('[scramjet] trying Wisp:', wispUrl);
       await connection.setTransport('/libcurl/browser.js', [{ wisp: wispUrl }]);
+      console.log('[scramjet] transport set via', wispUrl);
       return true;
-    } catch {
+    } catch (err) {
+      console.warn('[scramjet] transport failed for', wispUrl, err);
       return false;
     }
   };
 
-  const localOk = await trySetTransport(localWisp, 'local');
+  // Try local first with a short timeout, then public
+  const localOk = await Promise.race([
+    tryTransport(localWisp),
+    new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 5000)),
+  ]);
+
   if (!localOk) {
-    const publicOk = await trySetTransport(publicWisp, 'public');
-    if (!publicOk) throw new Error('No Wisp proxy server available — tried local and public fallback');
+    const publicOk = await Promise.race([
+      tryTransport(publicWisp),
+      new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 8000)),
+    ]);
+    if (!publicOk) throw new Error('Could not connect to any Wisp proxy server');
   }
+
   scramjetInitialized = true;
+  console.log('[scramjet] fully initialized');
 }
 
 function waitForController(registration: ServiceWorkerRegistration): Promise<void> {
@@ -96,16 +101,19 @@ function waitForController(registration: ServiceWorkerRegistration): Promise<voi
 
 function waitForGlobals(): Promise<void> {
   return new Promise((resolve, reject) => {
-    const timeout = window.setTimeout(() => reject(new Error('Scramjet v2 assets failed to load')), 10000);
-    const check = () => {
+    const timeout = window.setTimeout(
+      () => reject(new Error('Scramjet assets failed to load — check that /scram/ and /baremux/ files are served')),
+      15000,
+    );
+    // Use setInterval instead of requestAnimationFrame so this works
+    // even when the tab is backgrounded or RAF is throttled.
+    const interval = window.setInterval(() => {
       if (window.__scramjet$bundle && window.BareMux) {
+        window.clearInterval(interval);
         window.clearTimeout(timeout);
         resolve();
-        return;
       }
-      window.requestAnimationFrame(check);
-    };
-    check();
+    }, 100);
   });
 }
 

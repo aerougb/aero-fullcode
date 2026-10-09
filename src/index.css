@@ -163,24 +163,24 @@ body {
   position: absolute;
   inset: 0;
   content: '';
-  background: linear-gradient(135deg, rgba(2, 7, 17, 0.84), rgba(2, 7, 17, 0.52));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--bg-primary) 88%, transparent), color-mix(in srgb, var(--bg-primary) 52%, transparent));
 }
 
-/* Layer 1: base gradient wash — always visible, gives depth */
+/* Layer 1: base gradient wash — always visible, gives depth, follows theme accent */
 .aero-app-shell::before {
   position: absolute;
   inset: 0;
   z-index: -2;
   content: '';
   background:
-    radial-gradient(ellipse at 12% 8%, rgba(45, 140, 255, 0.22), transparent 38%),
-    radial-gradient(ellipse at 88% 72%, rgba(14, 116, 214, 0.16), transparent 40%),
-    radial-gradient(ellipse at 50% 100%, rgba(27, 92, 180, 0.12), transparent 50%),
-    linear-gradient(140deg, #04101f 0%, #061a33 42%, #03101e 100%);
+    radial-gradient(ellipse at 12% 8%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 38%),
+    radial-gradient(ellipse at 88% 72%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 40%),
+    radial-gradient(ellipse at 50% 100%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 50%),
+    linear-gradient(140deg, var(--bg-primary) 0%, var(--bg-secondary) 42%, var(--bg-primary) 100%);
   pointer-events: none;
 }
 
-/* Layer 2: slow-moving diagonal light bands — the signature animation */
+/* Layer 2: slow-moving diagonal light bands — the signature animation, tinted by accent */
 .aero-app-shell::after {
   position: absolute;
   inset: -30%;
@@ -190,7 +190,7 @@ body {
   background: repeating-linear-gradient(
     115deg,
     transparent 0 110px,
-    rgba(126, 203, 255, 0.07) 130px 133px,
+    color-mix(in srgb, var(--accent-light) 14%, transparent) 130px 133px,
     transparent 160px 280px
   );
   animation: aero-bg-drift 24s linear infinite;

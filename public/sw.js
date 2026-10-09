@@ -1,4 +1,4 @@
-const AERO_WORKER_VERSION = '20261007-v6';
+const AERO_WORKER_VERSION = '20261009-v7';
 importScripts('/scram/scramjet.codecs.js', '/scram/scramjet.bundle.js', '/scram/scramjet.worker.js');
 
 self.__scramjet$config = {
