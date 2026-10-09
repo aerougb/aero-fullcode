@@ -18,7 +18,10 @@ self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (event) => event.waitUntil(self.clients.claim()));
 self.addEventListener('fetch', (event) => {
   event.respondWith((async () => {
-    await scramjet.loadConfig();
-    return scramjet.route(event) ? scramjet.fetch(event) : fetch(event.request);
+    try {
+      return scramjet.route(event) ? scramjet.fetch(event) : fetch(event.request);
+    } catch {
+      return fetch(event.request);
+    }
   })());
 });

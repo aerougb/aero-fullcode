@@ -18,6 +18,18 @@
   Access-Control-Allow-Origin: *
   Cross-Origin-Resource-Policy: cross-origin
 
+/libcurl/browser.js
+  Content-Type: text/javascript; charset=utf-8
+
+/libcurl/index.mjs
+  Content-Type: text/javascript; charset=utf-8
+
+/libcurl/index.js
+  Content-Type: text/javascript; charset=utf-8
+
 /epoxy/*
   Access-Control-Allow-Origin: *
   Cross-Origin-Resource-Policy: cross-origin
+
+/epoxy/index.mjs
+  Content-Type: text/javascript; charset=utf-8
